@@ -11,11 +11,11 @@
 ![Status](https://img.shields.io/badge/Status-Master's%20Thesis-5B4B9A?style=for-the-badge)
 [![License](https://img.shields.io/badge/Code%20License-MIT-D4A017?style=for-the-badge)](LICENSE)
 
-**[▶ View the complete experimental demonstration](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0)**
+**[▶ View the complete experimental demonstration](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/download/v1.0.0/experimental-demonstration-ros2-mecanum-robot.mp4)**
 
 <br>
 
-<a href="https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0">
+<a href="https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/download/v1.0.0/experimental-demonstration-ros2-mecanum-robot.mp4">
   <img src="docs/images/hero-platform.jpg" width="850" alt="Four-wheel Mecanum mobile robot experimental platform">
 </a>
 
@@ -31,7 +31,7 @@
 |---|---|---|---|
 | 4-wheel Mecanum robot | 4 independent PI loops at 50 Hz | 6 closed trajectories | 2.34 RPM global MAE; 0.014 m estimated closure |
 
-**Quick access:** [Demonstration](#experimental-demonstration) · [Architecture](#distributed-software-architecture) · [Control](#control-architecture) · [Results](#experimental-validation) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Citation](#citation)
+**Quick access:** [Demonstration](#experimental-demonstration) · [Architecture](#distributed-software-architecture) · [Control](#control-architecture) · [Results](#experimental-validation) · [Detailed panels](#detailed-experimental-performance) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Citation](#citation)
 
 ---
 
@@ -97,16 +97,6 @@ The robot uses four Mecanum wheels to generate longitudinal translation, lateral
 ## Distributed Software Architecture
 
 The final implementation uses one ESP32 firmware, four main ROS 2 nodes on the Raspberry Pi, and a dedicated Python hardware-control library. A separate validation node is provided for elementary motion tests. The ROS 2 node name and its source filename may differ; both are identified below to avoid ambiguity.
-
-```mermaid
-flowchart TB
-    UI["keyboard_teleop<br/>Manual commands"] -->|/cmd_vel| CTRL["mecanum_teleop_node<br/>Inverse kinematics + 4 PI loops"]
-    TRAJ["mecanum_odometry_web_node<br/>Trajectories + odometry + dashboard"] -->|/cmd_vel| CTRL
-    FW["ESP32 firmware<br/>Encoder acquisition at 50 Hz"] -->|USB serial · 115200 bit/s| READER["esp32_encoder_reader<br/>ROS 2 interface at 50 Hz"]
-    READER -->|/esp32/wheel_rpm| CTRL
-    READER -->|/esp32/wheel_ticks| TRAJ
-    CTRL --> MOTOR["Four motor commands"]
-```
 
 ### Software modules
 
@@ -218,6 +208,45 @@ A single controller configuration was retained for the entire campaign. Six clos
 - The same controller configuration supported sequential translations, discrete rotations, and continuous combined motion.
 - Encoder-only odometry preserved the global trajectory geometry while revealing the expected cumulative effects of Mecanum-wheel slip.
 
+### Detailed Experimental Performance
+
+Each panel consolidates four complementary views of one experiment: instantaneous wheel-speed tracking errors, wheel-level PI/PWM commands, wheel-speed error metrics, and closed-loop control effort. Click any panel to inspect it at full resolution.
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <a href="docs/images/rectangle-30x40-performance.png"><img src="docs/images/rectangle-30x40-performance.png" alt="Four-panel performance summary for the 30 by 40 centimetre rectangle"></a><br>
+      <strong>Rectangle 30 × 40 cm</strong>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/rectangle-50x70-performance.png"><img src="docs/images/rectangle-50x70-performance.png" alt="Four-panel performance summary for the 50 by 70 centimetre rectangle"></a><br>
+      <strong>Rectangle 50 × 70 cm</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <a href="docs/images/rectangle-70x50-performance.png"><img src="docs/images/rectangle-70x50-performance.png" alt="Four-panel performance summary for the 70 by 50 centimetre rectangle"></a><br>
+      <strong>Rectangle 70 × 50 cm</strong>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/triangle-30-performance.png"><img src="docs/images/triangle-30-performance.png" alt="Four-panel performance summary for the 30 centimetre triangle"></a><br>
+      <strong>Equilateral triangle — 30 cm</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <a href="docs/images/triangle-50-performance.png"><img src="docs/images/triangle-50-performance.png" alt="Four-panel performance summary for the 50 centimetre triangle"></a><br>
+      <strong>Equilateral triangle — 50 cm</strong>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/circle-40-performance.png"><img src="docs/images/circle-40-performance.png" alt="Four-panel performance summary for the 40 centimetre diameter circle"></a><br>
+      <strong>Circle — 40 cm diameter</strong>
+    </td>
+  </tr>
+</table>
+
+> The transient peaks visible during direction changes correspond to reference discontinuities and wheel reversals. The panels are reported without suppressing these transients in order to preserve the traceability of the experimental observations.
+
 <div align="center">
   <img src="docs/images/six-trajectory-comparison.png" width="900" alt="Comparison of six experimental trajectories">
   <br>
@@ -250,8 +279,6 @@ ros2-mecanum-mobile-robot/
 │       └── mecanum_dashboard_validation_node.py
 ├── config/
 │   └── robot_parameters.yaml
-├── analysis/
-│   └── figure_generation/
 ├── data/
 │   └── README.md
 └── docs/
@@ -261,7 +288,13 @@ ros2-mecanum-mobile-robot/
         ├── ros2-architecture.png
         ├── web-dashboard.png
         ├── real-experiment-50x70.jpg
-        └── six-trajectory-comparison.png
+        ├── six-trajectory-comparison.png
+        ├── rectangle-30x40-performance.png
+        ├── rectangle-50x70-performance.png
+        ├── rectangle-70x50-performance.png
+        ├── triangle-30-performance.png
+        ├── triangle-50-performance.png
+        └── circle-40-performance.png
 ```
 
 The complete raw experimental CSV files may be provided separately because they contain high-frequency logs for the six validation scenarios.
@@ -320,7 +353,7 @@ python3 software/raspberry_pi/keyboard_teleop.py
 
 ## Reproducibility and Data
 
-The repository separates embedded firmware, ROS 2 control software, validated parameters, analysis scripts, and visual documentation. Representative data can be placed under `data/`, while complete high-frequency datasets may be distributed separately when their size makes direct repository storage impractical.
+The repository separates embedded firmware, ROS 2 control software, validated parameters, experimental results, and visual documentation. Representative data can be placed under `data/`, while complete high-frequency datasets may be distributed separately when their size makes direct repository storage impractical.
 
 For each published experiment, retain:
 
