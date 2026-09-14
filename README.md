@@ -7,7 +7,9 @@
 [![ROS 2](https://img.shields.io/badge/ROS%202-Distributed%20Control-22314E?style=for-the-badge&logo=ros)](https://docs.ros.org/)
 ![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi%20%2B%20ESP32-A22846?style=for-the-badge)
 ![Validation](https://img.shields.io/badge/Validation-6%20Experimental%20Trajectories-18864B?style=for-the-badge)
+![Frequency](https://img.shields.io/badge/Acquisition%20%26%20Control-50%20Hz-006D77?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Master's%20Thesis-5B4B9A?style=for-the-badge)
+[![License](https://img.shields.io/badge/Code%20License-MIT-D4A017?style=for-the-badge)](LICENSE)
 
 **[▶ View the complete experimental demonstration](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0)**
 
@@ -23,6 +25,16 @@
 
 ---
 
+## At a Glance
+
+| Experimental platform | Control | Validation | Best recorded indicators |
+|---|---|---|---|
+| 4-wheel Mecanum robot | 4 independent PI loops at 50 Hz | 6 closed trajectories | 2.34 RPM global MAE; 0.014 m estimated closure |
+
+**Quick access:** [Demonstration](#experimental-demonstration) · [Architecture](#distributed-software-architecture) · [Control](#control-architecture) · [Results](#experimental-validation) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Citation](#citation)
+
+---
+
 ## Project Highlights
 
 - **Real experimental platform** with four independently actuated Mecanum wheels.
@@ -31,7 +43,7 @@
 - **Four independent PI wheel-speed controllers** with feedforward compensation, saturation, and anti-windup.
 - **Encoder-based odometry**, automatic trajectory generation, angular correction, and web supervision.
 - **Six experimentally validated closed trajectories** using one common controller configuration.
-- **Full experimental traceability** through synchronized CSV logging at 50 Hz.
+- **Full experimental traceability** through synchronized acquisition, control, and CSV logging at 50 Hz.
 
 ## Experimental Demonstration
 
@@ -72,6 +84,7 @@ The robot uses four Mecanum wheels to generate longitudinal translation, lateral
 | Longitudinal half-dimension, `a` | 0.175 m |
 | Transverse half-dimension, `b` | 0.115 m |
 | Encoder resolution | 468 ticks/revolution |
+| Encoder acquisition and ROS 2 publication | 50 Hz |
 | Control frequency | 50 Hz |
 | Odometry update frequency | 50 Hz |
 | Serial communication | 115200 bit/s |
@@ -83,13 +96,13 @@ The robot uses four Mecanum wheels to generate longitudinal translation, lateral
 
 ## Distributed Software Architecture
 
-The final implementation uses one ESP32 firmware and four main ROS 2 nodes on the Raspberry Pi.
+The final implementation uses one ESP32 firmware, four main ROS 2 nodes on the Raspberry Pi, and a dedicated Python hardware-control library. A separate validation node is provided for elementary motion tests. The ROS 2 node name and its source filename may differ; both are identified below to avoid ambiguity.
 
 ```mermaid
 flowchart TB
     UI["keyboard_teleop<br/>Manual commands"] -->|/cmd_vel| CTRL["mecanum_teleop_node<br/>Inverse kinematics + 4 PI loops"]
     TRAJ["mecanum_odometry_web_node<br/>Trajectories + odometry + dashboard"] -->|/cmd_vel| CTRL
-    FW["ESP32 firmware<br/>Encoder acquisition"] -->|USB serial| READER["esp32_encoder_reader<br/>ROS 2 interface"]
+    FW["ESP32 firmware<br/>Encoder acquisition at 50 Hz"] -->|USB serial · 115200 bit/s| READER["esp32_encoder_reader<br/>ROS 2 interface at 50 Hz"]
     READER -->|/esp32/wheel_rpm| CTRL
     READER -->|/esp32/wheel_ticks| TRAJ
     CTRL --> MOTOR["Four motor commands"]
@@ -100,10 +113,12 @@ flowchart TB
 | Platform | Module | Main responsibility |
 |---|---|---|
 | ESP32 | `esp32_encoder_acquisition.ino` | Quadrature counting, RPM calculation, exponential filtering, and serial transmission |
-| Raspberry Pi | `keyboard_teleop.py` | Manual motion-command generation |
+| Raspberry Pi | `keyboard_teleop.py` — node `/keyboard_teleop_mecanum` | Manual motion-command generation |
 | Raspberry Pi | `mecanum_teleop_node.py` | Inverse kinematics, feedforward action, four PI loops, saturation, and motor commands |
 | Raspberry Pi | `esp32_encoder_reader.py` | Serial interface and publication of wheel RPM and cumulative ticks |
 | Raspberry Pi | `mecanum_odometry_web_node.py` | Direct kinematics, calibrated odometry, trajectories, angular control, web supervision, and CSV logging |
+| Raspberry Pi | `mecanum.py` | Mecanum geometry, inverse kinematics, feedforward calculation, PWM limiting, and motor-board actuation |
+| Raspberry Pi | `mecanum_dashboard_validation_node.py` | Complementary validation of elementary longitudinal, lateral, and rotational commands |
 
 ### Principal ROS 2 topics
 
@@ -112,6 +127,8 @@ flowchart TB
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | Chassis motion command |
 | `/esp32/wheel_rpm` | `std_msgs/msg/Float32MultiArray` | Measured speeds of the four wheels |
 | `/esp32/wheel_ticks` | `std_msgs/msg/Int32MultiArray` | Cumulative encoder counts |
+
+The serial interface reads and publishes encoder data every **0.02 s (50 Hz)**. Consequently, the wheel-speed regulation and measurement chain operate with a consistent 50 Hz experimental configuration.
 
 <div align="center">
   <img src="docs/images/ros2-architecture.png" width="900" alt="ROS 2 functional architecture">
@@ -137,7 +154,7 @@ The implementation includes:
 - independent proportional-integral correction for each wheel;
 - integral anti-windup;
 - PWM limitation to ±30;
-- multirate use of the latest available encoder measurement;
+- synchronized wheel-speed acquisition and control at 50 Hz;
 - calibrated longitudinal, transverse, and angular odometry;
 - two-stage angular approach with a ±1° termination tolerance.
 
@@ -224,9 +241,13 @@ ros2-mecanum-mobile-robot/
 │   │   └── esp32_encoder_acquisition.ino
 │   └── raspberry_pi/
 │       ├── keyboard_teleop.py
+│       ├── mecanum.py
 │       ├── mecanum_teleop_node.py
 │       ├── esp32_encoder_reader.py
 │       └── mecanum_odometry_web_node.py
+├── tools/
+│   └── validation/
+│       └── mecanum_dashboard_validation_node.py
 ├── config/
 │   └── robot_parameters.yaml
 ├── analysis/
@@ -257,6 +278,18 @@ The complete raw experimental CSV files may be provided separately because they 
 - ESP32 firmware flashed with the encoder-acquisition program;
 - four-wheel Mecanum mobile platform and compatible motor-power interface.
 
+### Python dependencies
+
+```bash
+python3 -m pip install pyserial numpy flask
+```
+
+The ROS 2 Python packages `rclpy`, `geometry_msgs`, and `std_msgs` must be provided by the installed ROS 2 distribution.
+
+### Serial access
+
+The default serial interface is `/dev/ttyUSB0` at 115200 bit/s. On Linux, ensure that the current user has permission to access the serial device before starting the acquisition node.
+
 ### Execution order
 
 ```bash
@@ -273,7 +306,29 @@ python3 software/raspberry_pi/mecanum_odometry_web_node.py
 python3 software/raspberry_pi/keyboard_teleop.py
 ```
 
-> Adapt the serial port, GPIO configuration, and launch procedure to the target Raspberry Pi and motor interface before execution.
+> The commands above document the experimental startup sequence. Adapt the ROS 2 package installation, serial port, GPIO configuration, and motor-board interface to the target Raspberry Pi before execution.
+
+### Runtime data flow
+
+1. The ESP32 acquires the four quadrature encoders and transmits filtered wheel data over USB serial.
+2. `esp32_encoder_reader.py` publishes wheel speeds and cumulative ticks at 50 Hz.
+3. `mecanum_teleop_node.py` computes wheel references, applies feedforward-plus-PI control, and drives the four motors.
+4. `mecanum_odometry_web_node.py` estimates the robot pose, generates trajectories, applies angular correction, and updates the web dashboard.
+5. Experimental variables are recorded in CSV format for offline analysis and figure generation.
+
+---
+
+## Reproducibility and Data
+
+The repository separates embedded firmware, ROS 2 control software, validated parameters, analysis scripts, and visual documentation. Representative data can be placed under `data/`, while complete high-frequency datasets may be distributed separately when their size makes direct repository storage impractical.
+
+For each published experiment, retain:
+
+- the trajectory name and dimensions;
+- the controller and odometry parameters;
+- the raw CSV recording;
+- the generated wheel-speed, error, PWM, and trajectory figures;
+- the software revision used during the test.
 
 ---
 
@@ -282,7 +337,7 @@ python3 software/raspberry_pi/keyboard_teleop.py
 | Field | Information |
 |---|---|
 | Author | **Mohamed Ali Maghrebi** |
-| Degree | Master of Applied Science (M.Sc.A.) in Engineering |
+| Degree | Master's degree in Engineering — research thesis |
 | Institution | Université du Québec à Rimouski (UQAR) |
 | Research supervisor | Prof. Tan Sy Nguyen |
 | Research areas | Mobile robotics, ROS 2, embedded systems, mechatronics, and control |
