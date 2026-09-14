@@ -1,0 +1,29 @@
+robot:
+  wheel_radius_m: 0.0325
+  longitudinal_half_dimension_m: 0.175
+  transverse_half_dimension_m: 0.115
+
+encoders:
+  resolution_ticks_per_revolution: 468
+  sampling_frequency_hz: 50
+  filter_coefficient: 0.30
+  serial_port: /dev/ttyUSB0
+  serial_baudrate: 115200
+
+control:
+  frequency_hz: 50
+  kp: 0.35
+  ki: 0.45
+  anti_windup_gain: 0.30
+  pwm_limit: 30
+
+odometry:
+  update_frequency_hz: 50
+  kx: 2.20
+  ky: 2.76
+  komega: 3.60
+
+trajectory:
+  translation_speed_m_s: 0.035
+  rotation_speed_rad_s: 0.12
+  angular_tolerance_deg: 1.0
