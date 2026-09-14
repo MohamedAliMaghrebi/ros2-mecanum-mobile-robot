@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# ROS 2 / colcon
+build/
+install/
+log/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary and generated files
+*.tmp
+*.log
+*~
+
+# Local experimental exports
+*.bag
+*.db3
