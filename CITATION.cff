@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use this software or the associated experimental results, please cite the master's thesis below."
+title: "Distributed ROS 2 Control Architecture for a Four-Wheel Mecanum Mobile Robot"
+type: software
+authors:
+  - family-names: Maghrebi
+    given-names: Mohamed Ali
+repository-code: "https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot"
+url: "https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0"
+version: 1.0.0
+date-released: 2026-09-14
+license: MIT
+keywords:
+  - ROS 2
+  - Mecanum wheels
+  - omnidirectional mobile robot
+  - embedded control
+  - Raspberry Pi
+  - ESP32
+  - odometry
+  - experimental validation
+preferred-citation:
+  type: thesis
+  title: "Design, Implementation, and Experimental Validation of a Distributed ROS 2 Control Architecture for a Four-Wheel Mecanum Mobile Robot"
+  authors:
+    - family-names: Maghrebi
+      given-names: Mohamed Ali
+  institution:
+    name: "Université du Québec à Rimouski"
+  year: 2026
