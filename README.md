@@ -280,7 +280,14 @@ ros2-mecanum-mobile-robot/
 ├── config/
 │   └── robot_parameters.yaml
 ├── data/
-│   └── README.md
+│   ├── README.md
+│   └── experimental/
+│       ├── rectangle-30x40.csv
+│       ├── rectangle-50x70.csv
+│       ├── rectangle-70x50.csv
+│       ├── triangle-30.csv
+│       ├── triangle-50.csv
+│       └── circle-40.csv
 └── docs/
     └── images/
         ├── hero-platform.jpg
@@ -297,7 +304,16 @@ ros2-mecanum-mobile-robot/
         └── circle-40-performance.png
 ```
 
-The complete raw experimental CSV files may be provided separately because they contain high-frequency logs for the six validation scenarios.
+The complete 50 Hz experimental CSV datasets used to generate the reported figures and performance indicators are available in [`data/experimental`](data/experimental). They provide traceability from the recorded wheel-level signals to the quantitative results presented in this repository.
+
+| Dataset | Experiment |
+|---|---|
+| [`rectangle-30x40.csv`](data/experimental/rectangle-30x40.csv) | Rectangle 30 × 40 cm |
+| [`rectangle-50x70.csv`](data/experimental/rectangle-50x70.csv) | Rectangle 50 × 70 cm |
+| [`rectangle-70x50.csv`](data/experimental/rectangle-70x50.csv) | Rectangle 70 × 50 cm |
+| [`triangle-30.csv`](data/experimental/triangle-30.csv) | Equilateral triangle, 30 cm side |
+| [`triangle-50.csv`](data/experimental/triangle-50.csv) | Equilateral triangle, 50 cm side |
+| [`circle-40.csv`](data/experimental/circle-40.csv) | Circle, 40 cm diameter |
 
 ---
 
@@ -353,7 +369,7 @@ python3 software/raspberry_pi/keyboard_teleop.py
 
 ## Reproducibility and Data
 
-The repository separates embedded firmware, ROS 2 control software, validated parameters, experimental results, and visual documentation. Representative data can be placed under `data/`, while complete high-frequency datasets may be distributed separately when their size makes direct repository storage impractical.
+The repository separates embedded firmware, ROS 2 control software, validated parameters, complete experimental datasets, quantitative results, and visual documentation. The six CSV recordings are published under `data/experimental` to support inspection and reproducibility.
 
 For each published experiment, retain:
 
