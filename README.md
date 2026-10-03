@@ -47,9 +47,15 @@
 
 ## Experimental Demonstration
 
-The complete video documents the physical platform, the ROS 2 control architecture, the web-based dashboard, and the execution of rectangular, triangular, and circular trajectories.
+The platform was experimentally validated through six closed trajectories. The accompanying video presents three representative tests from this validation campaign:
 
-### [Open Experimental Demonstration — Release v1.0.0](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0)
+- **Rectangular trajectory:** 50 × 70 cm;
+- **Equilateral triangular trajectory:** 50 cm side length;
+- **Circular trajectory:** 40 cm diameter.
+
+The video presents the physical platform, the ROS 2 control architecture, and the web-based dashboard. Each trajectory test shows the physical robot executing the motion alongside the dashboard visualization of the estimated path.
+
+### [Watch the Experimental Demonstration — Release v1.0.0](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/tag/v1.0.0)
 
 **Video asset:** `experimental-demonstration-ros2-mecanum-robot.mp4`
 
