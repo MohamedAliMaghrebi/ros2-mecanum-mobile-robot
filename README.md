@@ -11,7 +11,7 @@
 ![Status](https://img.shields.io/badge/Status-Master's%20Thesis-5B4B9A?style=for-the-badge)
 [![License](https://img.shields.io/badge/Code%20License-MIT-D4A017?style=for-the-badge)](LICENSE)
 
-**[▶ View the complete experimental demonstration](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/download/v1.0.0/experimental-demonstration-ros2-mecanum-robot.mp4)**
+**[▶ Watch the experimental demonstration](https://github.com/MohamedAliMaghrebi/ros2-mecanum-mobile-robot/releases/download/v1.0.0/experimental-demonstration-ros2-mecanum-robot.mp4)**
 
 <br>
 
